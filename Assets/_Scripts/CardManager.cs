@@ -58,7 +58,6 @@ public class CardManager : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(score);
     }
 
     public void GenerateCards()
