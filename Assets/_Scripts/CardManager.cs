@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,26 +51,30 @@ public class CardManager : MonoBehaviour
             return;
         }
 
+        List<CardMatch> cardPool = new List<CardMatch>();
         for (int i = 0; i < pairsNeeded; i++)
         {
-            Card card1 = CreateCard(cardMatches[i].CardType, cardMatches[i].CardSprite);
-            allCards.Add(card1);
-
-            Card card2 = CreateCard(cardMatches[i].CardType, cardMatches[i].CardSprite);
-            allCards.Add(card2);
+            cardPool.Add(cardMatches[i]);
+            cardPool.Add(cardMatches[i]);
         }
 
-        ShuffleCards();
+        ShuffleCards(cardPool);
+
+        foreach (CardMatch cardMatch in cardPool)
+        {
+            Card newCard = CreateCard(cardMatch.CardType, cardMatch.CardSprite);
+            allCards.Add(newCard);
+        }
     }
 
-    private void ShuffleCards()
+    private void ShuffleCards(List<CardMatch> pool)
     {
-        for (int i = 0; i < allCards.Count; i++)
+        for (int i = 0; i < pool.Count; i++)
         {
-            Card temp = allCards[i];
-            int randomIndex = UnityEngine.Random.Range(i, allCards.Count);
-            allCards[i] = allCards[randomIndex];
-            allCards[randomIndex] = temp;
+            CardMatch temp = pool[i];
+            int randomIndex = UnityEngine.Random.Range(i, pool.Count);
+            pool[i] = pool[randomIndex];
+            pool[randomIndex] = temp;
         }
     }
 
@@ -83,8 +85,6 @@ public class CardManager : MonoBehaviour
         newCard.SetCardSprite(cardSprite);
         return newCard;
     }
-
-    
 
     private void ValidateGridSize()
     {
