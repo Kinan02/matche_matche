@@ -1,0 +1,23 @@
+public enum CardType
+{
+    Anchor,
+    Apple,
+    Bananas,
+    Barrel,
+    Bell,
+    Blue_cloth,
+    Bottle,
+    Bottle2,
+    Bricks,
+    Bronze_bars,
+    Bucket,
+    Chain,
+    China,
+    Cigar,
+    Cigars,
+    Cigar_vertical,
+    Citrus,
+    Cloth,
+    Cloth2,
+    Cloves,
+}
