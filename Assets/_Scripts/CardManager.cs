@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class CardManager : MonoBehaviour
 {
+    public static CardManager Instance;
+
     [SerializeField] private Card cardPrefab;
 
     [SerializeField] private Transform gridTransform;
@@ -14,6 +16,12 @@ public class CardManager : MonoBehaviour
 
     [SerializeField] private List<CardMatch> cardMatches = new List<CardMatch>();
     private List<Card> allCards = new List<Card>();
+
+    private Queue<Card> selectedCards = new Queue<Card>();
+
+    private int matchCount = 0;
+    private int totalPairs;
+
 
 
     [System.Serializable]
@@ -28,6 +36,18 @@ public class CardManager : MonoBehaviour
         ValidateGridSize();
         SetupGridLayout();
         GenerateCards();
+
+        totalPairs = (int)(gridSize.x * gridSize.y) / 2;
+
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
     }
 
     void Start()
@@ -72,7 +92,7 @@ public class CardManager : MonoBehaviour
         for (int i = 0; i < pool.Count; i++)
         {
             CardMatch temp = pool[i];
-            int randomIndex = UnityEngine.Random.Range(i, pool.Count);
+            int randomIndex = Random.Range(i, pool.Count);
             pool[i] = pool[randomIndex];
             pool[randomIndex] = temp;
         }
@@ -84,6 +104,43 @@ public class CardManager : MonoBehaviour
         newCard.SetCardType(cardType);
         newCard.SetCardSprite(cardSprite);
         return newCard;
+    }
+
+    public void SetSelected(Card card)
+    {
+        if (card.isSelected)
+            return;
+
+        card.Show();
+        selectedCards.Enqueue(card);
+
+        if (selectedCards.Count >= 2)
+        {
+            CheckMatching();
+        }
+    }
+
+    private void CheckMatching()
+    {
+        Card firstCard = selectedCards.Dequeue();
+        Card secondCard = selectedCards.Dequeue();
+
+        if (firstCard.cardType == secondCard.cardType)
+        {
+            firstCard.MarkMatched();
+            secondCard.MarkMatched();
+            matchCount++;
+
+            if (matchCount >= totalPairs)
+            {
+                Debug.Log("Game Won! All matches found!");
+            }
+        }
+        else
+        {
+            firstCard.HideWithDelay(0.5f);
+            secondCard.HideWithDelay(0.5f);
+        }
     }
 
     private void ValidateGridSize()

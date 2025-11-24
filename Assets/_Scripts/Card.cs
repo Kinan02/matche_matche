@@ -1,8 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class Card : MonoBehaviour
 {
@@ -11,35 +10,41 @@ public class Card : MonoBehaviour
 
     [SerializeField] private Sprite hiddenSprite;
     public Sprite revealedSprite { private get; set; }
-    public CardType cardType { private get; set; }
+    public CardType cardType { get; set; }
 
-    private bool isSelected;
+    public bool isSelected { get; private set; }
 
-    void Awake()
+    void Start()
     {
         if (cardButton != null)
             cardButton.onClick.AddListener(() => {
-                Show(); 
+                OnCardClick();
             });
     }
 
-    private void Start()
+    private void OnCardClick()
     {
-        
+        CardManager.Instance.SetSelected(this);
     }
 
-    void Update()
-    {
-
-    }
-
-    private void Show()
+    public void Show()
     {
         iconImage.sprite = revealedSprite;
         isSelected = true;
     }
 
-    public void Hide()
+    public void HideWithDelay(float delay)
+    {
+        StartCoroutine(HideRoutine(delay));
+    }
+
+    private IEnumerator HideRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Hide();
+    }
+
+    private void Hide()
     {
         iconImage.sprite = hiddenSprite;
         isSelected = false;
@@ -47,6 +52,13 @@ public class Card : MonoBehaviour
 
     public void SetCardType(CardType ct) => cardType = ct;
     public void SetCardSprite(Sprite cs) => revealedSprite = cs;
+    public void SetSelected() => isSelected = true;
+    public void MarkMatched()
+    {
+        isSelected = false;
+        cardButton.interactable = false;
+        iconImage.color = new Color(0.7f, 0.7f, 0.7f, 0.8f);
+    }
     
 
 }
