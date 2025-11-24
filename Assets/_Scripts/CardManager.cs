@@ -20,6 +20,7 @@ public class CardManager : MonoBehaviour
     private Queue<Card> selectedCards = new Queue<Card>();
 
     private int matchCount = 0;
+    private int score = 0;
     private int totalPairs;
 
 
@@ -57,7 +58,7 @@ public class CardManager : MonoBehaviour
 
     void Update()
     {
-        
+        Debug.Log(score);
     }
 
     public void GenerateCards()
@@ -130,6 +131,7 @@ public class CardManager : MonoBehaviour
             firstCard.MarkMatched();
             secondCard.MarkMatched();
             matchCount++;
+            score++;
 
             if (matchCount >= totalPairs)
             {
@@ -140,6 +142,7 @@ public class CardManager : MonoBehaviour
         {
             firstCard.HideWithDelay(0.5f);
             secondCard.HideWithDelay(0.5f);
+            score--;
         }
     }
 
