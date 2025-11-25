@@ -36,9 +36,24 @@ public class CardManager : MonoBehaviour
 
     private void Awake()
     {
+        allCards.Clear();
+        matchCount = 0;
+        if (PlayerPrefs.HasKey("GridX") && PlayerPrefs.HasKey("GridY"))
+        {
+            gridSize = new Vector2(
+                PlayerPrefs.GetFloat("GridX"),
+                PlayerPrefs.GetFloat("GridY")
+            );
+        }
+
         ValidateGridSize();
         SetupGridLayout();
-        GenerateCards();
+
+        if (PlayerPrefs.HasKey("LAYOUT"))
+            GenerateEmptyCards();
+        else
+            GenerateCards();
+
 
         totalPairs = (int)(gridSize.x * gridSize.y) / 2;
 
@@ -49,13 +64,26 @@ public class CardManager : MonoBehaviour
         else
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
     }
 
     void Start()
     {
+        LoadGame();
+
         StartCoroutine(ShowAllCardsAtStart());
+    }
+
+    private void GenerateEmptyCards()
+    {
+        int totalCards = (int)(gridSize.x * gridSize.y);
+
+        for (int i = 0; i < totalCards; i++)
+        {
+            Card newCard = Instantiate(cardPrefab, gridTransform);
+            newCard.SetIndex(i);
+            allCards.Add(newCard);
+        }
     }
 
     private IEnumerator ShowAllCardsAtStart()
@@ -71,14 +99,15 @@ public class CardManager : MonoBehaviour
 
         foreach (Card card in allCards)
         {
-            card.HideWithDelay(0f);
+            if (!card.isMatched)
+                card.HideWithDelay(0f);
         }
 
         canSelect = true;
     }
 
 
-    public void GenerateCards()
+    private void GenerateCards()
     {
         int totalCards = (int)(gridSize.x * gridSize.y);
         int pairsNeeded = totalCards / 2;
@@ -121,6 +150,7 @@ public class CardManager : MonoBehaviour
         Card newCard = Instantiate(cardPrefab, gridTransform);
         newCard.SetCardType(cardType);
         newCard.SetCardSprite(cardSprite);
+        newCard.SetIndex(allCards.Count);
         return newCard;
     }
 
@@ -149,8 +179,11 @@ public class CardManager : MonoBehaviour
             matchCount++;
             score++;
 
+            SaveGame();
+
             if (matchCount >= totalPairs)
             {
+                ResetGameData();
                 Debug.Log("Game Won! All matches found!");
             }
         }
@@ -198,6 +231,105 @@ public class CardManager : MonoBehaviour
             return;
         }
     }
+
+    private const string SAVE_KEY = "CARD_SAVE";
+
+    private void SaveGame()
+    {
+        List<string> matchedIndexes = new List<string>();
+        List<string> layoutData = new List<string>();
+
+        foreach (Card card in allCards)
+        {
+            layoutData.Add(card.cardIndex + ":" + card.cardType.ToString());
+
+            if (card.isMatched)
+            {
+                matchedIndexes.Add(card.cardIndex.ToString());
+            }
+        }
+
+        PlayerPrefs.SetString("MATCHED", string.Join(",", matchedIndexes));
+        PlayerPrefs.SetString("LAYOUT", string.Join("|", layoutData));
+
+        PlayerPrefs.SetFloat("GridX", gridSize.x);
+        PlayerPrefs.SetFloat("GridY", gridSize.y);
+
+        PlayerPrefs.Save();
+    }
+
+
+    private void LoadGame()
+    {
+        if (!PlayerPrefs.HasKey("LAYOUT"))
+            return;
+
+        string layout = PlayerPrefs.GetString("LAYOUT");
+        string[] cardData = layout.Split('|');
+
+        foreach (string data in cardData)
+        {
+            string[] parts = data.Split(':');
+            int index = int.Parse(parts[0]);
+            CardType type = (CardType)System.Enum.Parse(typeof(CardType), parts[1]);
+
+            if (index < allCards.Count)
+            {
+                Card card = allCards[index];
+                card.SetCardType(type);
+
+                Sprite sprite = GetSpriteForType(type);
+                card.SetCardSprite(sprite);
+            }
+        }
+
+        if (PlayerPrefs.HasKey("MATCHED"))
+        {
+            string[] matchedIndexes = PlayerPrefs.GetString("MATCHED").Split(',');
+            int loadedCards = 0;
+
+            foreach (string indexStr in matchedIndexes)
+            {
+                if (int.TryParse(indexStr, out int index))
+                {
+                    if (index >= 0 && index < allCards.Count)
+                    {
+                        Card card = allCards[index];
+                        card.MarkMatched();
+                        card.Show();
+                        loadedCards++;
+                    }
+                }
+            }
+
+            matchCount = loadedCards / 2;
+        }
+
+    }
+    private Sprite GetSpriteForType(CardType type)
+    {
+        foreach (var match in cardMatches)
+        {
+            if (match.CardType == type)
+                return match.CardSprite;
+        }
+        return null;
+    }
+
+    private void ResetGameData()
+    {
+        PlayerPrefs.DeleteKey("GridX");
+        PlayerPrefs.DeleteKey("GridY");
+        PlayerPrefs.DeleteKey("LAYOUT");
+        PlayerPrefs.DeleteKey("MATCHED");
+        PlayerPrefs.DeleteKey("CARD_SAVE");
+
+        PlayerPrefs.Save();
+
+        Debug.Log("All game data reset!");
+    }
+
+
 
 
 }
