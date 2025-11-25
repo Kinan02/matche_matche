@@ -72,6 +72,7 @@ public class CardManager : MonoBehaviour
     void Start()
     {
         LoadGame();
+        scoreText.text = $"Score : {score}";
         StartCoroutine(ShowAllCardsAtStart());
     }
 
@@ -179,6 +180,7 @@ public class CardManager : MonoBehaviour
             secondCard.MarkMatched();
             matchCount++;
             score++;
+            scoreText.text = $"Score : {score}";
 
             SaveGame();
 
@@ -193,6 +195,9 @@ public class CardManager : MonoBehaviour
             firstCard.HideWithDelay(0.5f);
             secondCard.HideWithDelay(0.5f);
             score--;
+            scoreText.text = $"Score : {score}";
+
+            SaveGame();
         }
     }
 
@@ -255,6 +260,7 @@ public class CardManager : MonoBehaviour
 
         PlayerPrefs.SetFloat("GridX", gridSize.x);
         PlayerPrefs.SetFloat("GridY", gridSize.y);
+        PlayerPrefs.SetInt("SCORE", score);
 
         PlayerPrefs.Save();
     }
@@ -304,6 +310,8 @@ public class CardManager : MonoBehaviour
             }
 
             matchCount = loadedCards / 2;
+            score = PlayerPrefs.GetInt("SCORE");
+            
         }
 
     }
@@ -324,6 +332,7 @@ public class CardManager : MonoBehaviour
         PlayerPrefs.DeleteKey("LAYOUT");
         PlayerPrefs.DeleteKey("MATCHED");
         PlayerPrefs.DeleteKey("CARD_SAVE");
+        PlayerPrefs.DeleteKey("SCORE");
 
         PlayerPrefs.Save();
 
