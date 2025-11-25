@@ -322,7 +322,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -433,7 +433,7 @@ MonoBehaviour:
   cardPrefab: {fileID: 9017413085209794646, guid: 0afa45ec02204574bb4313c565de5c4e, type: 3}
   gridTransform: {fileID: 1656455820}
   gridLayout: {fileID: 1656455819}
-  gridSize: {x: 3, y: 2}
+  gridSize: {x: 5, y: 6}
   cardMatches:
   - CardType: 0
     CardSprite: {fileID: 21300000, guid: 2dc550227cbd6794fa80ee080ad27473, type: 3}
