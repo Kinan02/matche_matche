@@ -12,6 +12,7 @@ public class CardManager : MonoBehaviour
     [SerializeField] private Transform gridTransform;
     [SerializeField] private GridLayoutGroup gridLayout;
     [SerializeField] private Vector2 gridSize = new Vector2(4, 4);
+    [SerializeField] private Text scoreText;
 
 
 
@@ -38,6 +39,7 @@ public class CardManager : MonoBehaviour
     {
         allCards.Clear();
         matchCount = 0;
+
         if (PlayerPrefs.HasKey("GridX") && PlayerPrefs.HasKey("GridY"))
         {
             gridSize = new Vector2(
@@ -70,7 +72,6 @@ public class CardManager : MonoBehaviour
     void Start()
     {
         LoadGame();
-
         StartCoroutine(ShowAllCardsAtStart());
     }
 
