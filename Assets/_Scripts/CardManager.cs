@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,7 @@ public class CardManager : MonoBehaviour
     private int score = 0;
     private int totalPairs;
 
+    private bool canSelect = false;
 
 
     [System.Serializable]
@@ -53,12 +55,28 @@ public class CardManager : MonoBehaviour
 
     void Start()
     {
-        
+        StartCoroutine(ShowAllCardsAtStart());
     }
 
-    void Update()
+    private IEnumerator ShowAllCardsAtStart()
     {
+        canSelect = false;
+
+        foreach (Card card in allCards)
+        {
+            card.Show();
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        foreach (Card card in allCards)
+        {
+            card.HideWithDelay(0f);
+        }
+
+        canSelect = true;
     }
+
 
     public void GenerateCards()
     {
@@ -108,16 +126,15 @@ public class CardManager : MonoBehaviour
 
     public void SetSelected(Card card)
     {
-        if (card.isSelected)
-            return;
+        if (!canSelect) return;
+
+        if (card.isSelected) return;
 
         card.Show();
         selectedCards.Enqueue(card);
 
         if (selectedCards.Count >= 2)
-        {
             CheckMatching();
-        }
     }
 
     private void CheckMatching()
