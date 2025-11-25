@@ -33,6 +33,8 @@ public class Card : MonoBehaviour
     {
         iconImage.sprite = revealedSprite;
         isSelected = true;
+
+        AudioManager.Instance.PlayCardFlip();
     }
 
     public void HideWithDelay(float delay)
@@ -50,6 +52,8 @@ public class Card : MonoBehaviour
     {
         iconImage.sprite = hiddenSprite;
         isSelected = false;
+
+        AudioManager.Instance.PlayCardFlip();
     }
 
     public void SetCardType(CardType ct) => cardType = ct;

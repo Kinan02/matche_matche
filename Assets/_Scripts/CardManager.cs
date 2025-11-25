@@ -182,11 +182,14 @@ public class CardManager : MonoBehaviour
             score++;
             scoreText.text = $"Score : {score}";
 
+            AudioManager.Instance.PlayCorrectChoice();
+
             SaveGame();
 
             if (matchCount >= totalPairs)
             {
                 ResetGameData();
+                AudioManager.Instance.PlayWin();
                 Debug.Log("Game Won! All matches found!");
             }
         }
@@ -198,6 +201,8 @@ public class CardManager : MonoBehaviour
             scoreText.text = $"Score : {score}";
 
             SaveGame();
+
+            AudioManager.Instance.PlayWrongChoice();
         }
     }
 
